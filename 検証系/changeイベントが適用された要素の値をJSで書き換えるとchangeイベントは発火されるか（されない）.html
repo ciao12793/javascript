@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <title>changeイベントが適用された要素の値をJSで書き換えるとchangeイベントは発火されるか</title>
+</head>
+<body>
+
+<h3>目的</h3>
+<ul>
+  <li>changeイベントが適用された要素の値をJSで書き換えるとchangeイベントは発火されるか -> 発生しない
+</ul>
+
+<h3>確認方法</h3>
+<ul>
+  <li>「値を書き換える」ボタンを押下
+</ul>
+
+<h3>検証内容</h3>
+
+<form id="myform">
+  <p>changeでalertを出力</p>
+  <input type="text" id="mytext" value="test">
+
+  <button type="button" id="mybutton">値を書き換える</button>
+</form>
+
+
+<script
+  src="https://code.jquery.com/jquery-3.1.1.slim.min.js"
+  integrity="sha256-/SIrNqv8h6QGKDuNoLGA4iret+kyesCkHGzVUUV0shc="
+  crossorigin="anonymous">
+</script>
+<script type="text/javascript">
+
+$('#mytext').on('change',function(){
+	alert('text value has changed'); 
+});
+
+$('#mybutton').on('click',function(){
+  // ここで書き換えた際にイベントが発火されるか確認
+  $('#mytext').val('value rewrite by button clicked');
+});
+
+
+</script>
+
+</body>
+</html>

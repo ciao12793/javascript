@@ -1,0 +1,58 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <title>jqueryのmapで単一値でなく配列を返したらどう扱われるか</title>
+</head>
+<body>
+
+<h3>目的</h3>
+<ul>
+  <li>jqueryのmapで単一値でなく配列を返したらどう扱われるか -> 返却した要素数だけ返される。配列
+  <li>〇：mapに渡した要素数≠返却された要素数。
+  <li>×：mapに渡した要素数＝返却された要素数。
+</ul>
+
+<h3>確認方法</h3>
+<ul>
+  <li>F12で開発者ログのコンソールログを見る
+</ul>
+
+<h3>検証内容</h3>
+
+<script
+  src="https://code.jquery.com/jquery-3.1.1.slim.min.js"
+  integrity="sha256-/SIrNqv8h6QGKDuNoLGA4iret+kyesCkHGzVUUV0shc="
+  crossorigin="anonymous"></script>
+<script type="text/javascript">
+
+var array = [
+ { "id": 1, "text" : "text1"},
+ { "id": 2, "text" : "text2"},
+ { "id": 3, "text" : "text3"}
+];
+
+
+// textのみ抽出する一番簡単な例
+var result = $.map(array, function(item, index) {
+  return item.text;
+});
+console.log(result);
+
+// id,textを返却してみる
+var resultArray = $.map(array, function(item, index) {
+  return [item.id, item.text];
+});
+console.log(resultArray);
+
+// index,id,textを返却してみる
+var resultArray2 = $.map(array, function(item, index) {
+  return [index, item.text, item.text];
+});
+console.log(resultArray2);
+
+</script>
+
+</body>
+</html>

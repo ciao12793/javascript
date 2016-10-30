@@ -1,0 +1,108 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <title>動的に要素を作る（option、hidden）</title>
+</head>
+<body>
+
+<h3>目的</h3>
+<ul>
+  <li>動的に要素を作る
+  <li>option
+  <li>option hidden
+</ul>
+
+<h3>確認方法</h3>
+<ul>
+  <li>開発者ツールでhidden要素が生成されていることを確認
+</ul>
+
+<h3>検証内容</h3>
+
+<form id="myform">
+  <select id="select1"></select>
+  <span id="optionHiddenAreaByArray"></span>
+</form>
+
+
+
+<script
+  src="https://code.jquery.com/jquery-3.1.1.slim.min.js"
+  integrity="sha256-/SIrNqv8h6QGKDuNoLGA4iret+kyesCkHGzVUUV0shc="
+  crossorigin="anonymous"></script>
+<script type="text/javascript">
+
+/**
+ * option要素作成
+ * ref. http://qiita.com/kazu56/items/8e92d08fd1bba0a2d771
+ */
+var createOptionElement = function(text, value) {
+  return $('<option />', {
+    val : value,
+    text : text
+  });
+}
+
+/**
+ * option要素を更新
+ */
+var updateOption = function(targetElement, options) {
+  // optionをいったん全消し
+  $('#' + targetElement + 'option').remove();
+
+  // optionを追加
+  $('#' + targetElement).append(options);
+}
+
+/**
+ * hidden要素作成（配列から）
+ */
+var createOptionHiddenElementByArray = function(nameAttribute, index, text, value) {
+  var hiddenValue = $('<input />', {
+    type : "hidden",
+    name : nameAttribute + "[" + index + "]",
+    value : value
+  });
+
+  var hiddenText = $('<input />', {
+    type : "hidden",
+    name : nameAttribute + "[" + index + "]",
+    value : text
+  });
+
+  return [ hiddenValue, hiddenText];
+}
+
+var updateHidden = function(targetElement, options) {
+  // optionをいったん全消し
+  $('#' + targetElement + 'input').remove();
+
+  // optionを追加
+  $('#' + targetElement).append(options);
+}
+
+var array = [
+ { "id": 1, "text" : "text1"},
+ { "id": 2, "text" : "text2"},
+ { "id": 3, "text" : "text3"}
+];
+
+// optionを動的に生成
+var options = $.map(array, function(item, index) {
+  return createOptionElement(item.text, item.id);
+});
+updateOption("select1", options);
+
+// optionのhidden要素を動的に作成
+var hiddenOptionsByArray = $.map(array, function(item, index) {
+  return createOptionHiddenElementByArray('optionHiddenByArray', index, item.text, item.id);
+});
+updateHidden("optionHiddenAreaByArray", hiddenOptionsByArray);
+
+
+</script>
+
+</body>
+</html>

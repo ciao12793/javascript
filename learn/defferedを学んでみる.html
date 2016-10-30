@@ -1,0 +1,96 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <title>defferedを学んでみる</title>
+</head>
+<body>
+
+<h3>目的</h3>
+<ul>
+  <li>defferedを学ぶ。
+</ul>
+
+<h3>概要</h3>
+<ul>
+  <li>JQueryに用意された非同期処理を直列化して記述可能にするためのフレームワーク。処理と処理をつなげる。Defferedは延期、遅延などの意味。
+  <li>イメージ：関数を呼び出すとPromiseオブジェクトという引換券をもらい、処理が完了したらPromiseに通知がきて、クライアントではdone(),fail(),always()などが使えるという仕組み。
+</ul>
+
+<h3>Defferedオブジェクトの役割</h3>
+<ul>
+  <li>Defferedオブジェクトを作成する。
+  <li>promise()メソッドでPromiseオブジェクトを生成する。これは状態を持つオブジェクトでクライアントに返す引換券のようなイメージ。
+  <li>resolve()またはreject()を呼ぶことでPromiseの状態を確定させる。
+  <li>前処理側でDefferedオブジェクトが参照できる必要がある。
+</ul>
+
+<h3>Promiseオブジェクトの役割</h3>
+<ul>
+  <li>状態と後続処理のためのI/Fを持つ。
+  <li>done(), fail(), always()というメソッドを持つ。順に成功時、失敗時、常にという呼ばれ方をする。
+  <li>done(), always()の両方を定義するとdone()の後にalways()が呼ばれる -> 要確認
+  <li>後続処理を定義する側でPromiseオブジェクトは必要となる。
+</ul>
+
+
+<h3>確認方法</h3>
+<ul>
+  <li>開発者ツールでコンソールログを参照
+</ul>
+
+<h3>検証内容</h3>
+
+<form id="myform">
+  <p>処理結果：<select id="resultType">
+    <option value="true">成功</option>
+    <option value="">失敗</option>
+  </select>
+  </p>
+  <button type="button" id="exec">実行</button>
+</form>
+
+
+<!-- jQuery -->
+<script
+  src="https://code.jquery.com/jquery-3.1.1.slim.min.js"
+  integrity="sha256-/SIrNqv8h6QGKDuNoLGA4iret+kyesCkHGzVUUV0shc="
+  crossorigin="anonymous"></script>
+
+<script type="text/javascript">
+
+function run() {
+  var deffered = $.Deferred();
+  
+  // ここでpromiseの値を確定させてしまってもOK。
+  var resultType = Boolean( $('#resultType').val() );
+  console.log("resultType", resultType);
+  resultType ? deffered.resolve("parameter for done!!") : deffered.reject("parameter for fail!!");
+  
+  // 返却オブジェクトがPromiseになる。
+  return deffered.promise();
+}
+
+function done(data){
+  console.log("done called.", data);
+}
+
+function fail(data) {
+  console.log("fail called", data);
+}
+
+function always(data) {
+  console.log("always called", data);
+}
+
+$('#exec').on('click', function() {
+  var promise = run();
+  promise.done(done);
+  promise.fail(fail);
+  promise.always(always);
+});
+</script>
+
+</body>
+</html>

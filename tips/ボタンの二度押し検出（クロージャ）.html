@@ -1,0 +1,86 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+</head>
+<body>
+
+<h3>目的</h3>
+<ul>
+<li>個々のボタンの２度押し検出
+<li>全体でのボタンの２度押し検出
+</ul>
+
+<h3>確認方法</h3>
+<ul>
+  <li>F12で開発者ログのコンソールログを見る
+</ul>
+
+<!-- ここからHTML -->
+<h3>検証内容</h3>
+
+<form id="myform">
+  <p>(A) input type="button"</p>
+  <input type="button" id="inputButton" value="ボタン（AとCでクリックされたか共有）">
+
+  <p>(B) input type="submit"</p>
+  <input type="submit" id="inputSubmit" value="サブミット（サブミットは表現が異なるだけでBとDはformに対してsubmitする）">
+
+  <p>(C) button type="text"</p>
+  <button type="button" id="buttonButton">ボタン（共有１）</button>
+
+  <p>(D) button type="submit"</p>
+  <button type="submit" id="buttonSubmit">サブミット（サブミットは表現が異なるだけでBとDはformに対してsubmitする）</button>
+</form>
+
+
+<!-- ここからJS -->
+
+<script type="text/javascript">
+
+  // ボタン全体で共有。ある確定ボタンを押下すると他のボタンを押せないようにするために用いる
+  var alreadyButtonClicked = function() {
+    var clicked = false;
+
+    return function() {
+       console.log("clicked", clicked);
+       if(clicked) {
+         return true;
+       }
+
+       clicked = true;
+       return false;
+    };
+
+  }();
+  
+  // 必要に応じてオブジェクトが作成できるfunction
+  function buttonClicked() {
+    var clicked = false;
+
+    return function() {
+       console.log("clicked", clicked);
+       if(clicked) {
+         return true;
+       }
+
+       clicked = true;
+       return false;
+    };
+  };
+  var submitButtonCliked = buttonClicked();
+  
+
+  $('#inputButton').on('click', alreadyButtonClicked );
+  $('#buttonButton').on('click', alreadyButtonClicked);
+  
+  $("#myform").submit(function() {
+    console.log('submit button clicked.');
+    return false;
+  });
+
+</script>
+
+</body>
+</html>
