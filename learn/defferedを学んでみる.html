@@ -3,27 +3,27 @@
 <head>
   <meta charset="utf-8"/>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-  <title>defferedを学んでみる</title>
+  <title>deferredを学んでみる</title>
 </head>
 <body>
 
 <h3>目的</h3>
 <ul>
-  <li>defferedを学ぶ。
+  <li>deferredを学ぶ。
 </ul>
 
 <h3>概要</h3>
 <ul>
-  <li>JQueryに用意された非同期処理を直列化して記述可能にするためのフレームワーク。処理と処理をつなげる。Defferedは延期、遅延などの意味。
+  <li>JQueryに用意された非同期処理を直列化して記述可能にするためのフレームワーク。処理と処理をつなげる。deferredは延期、遅延などの意味。
   <li>イメージ：関数を呼び出すとPromiseオブジェクトという引換券をもらい、処理が完了したらPromiseに通知がきて、クライアントではdone(),fail(),always()などが使えるという仕組み。
 </ul>
 
-<h3>Defferedオブジェクトの役割</h3>
+<h3>deferredオブジェクトの役割</h3>
 <ul>
-  <li>Defferedオブジェクトを作成する。
+  <li>deferredオブジェクトを作成する。
   <li>promise()メソッドでPromiseオブジェクトを生成する。これは状態を持つオブジェクトでクライアントに返す引換券のようなイメージ。
   <li>resolve()またはreject()を呼ぶことでPromiseの状態を確定させる。
-  <li>前処理側でDefferedオブジェクトが参照できる必要がある。
+  <li>前処理側でdeferredオブジェクトが参照できる必要がある。
 </ul>
 
 <h3>Promiseオブジェクトの役割</h3>
@@ -43,7 +43,7 @@
 <h3>検証内容</h3>
 
 <form id="myform">
-  <p>処理結果：<select id="resultType">
+  <p>Step2の処理結果：<select id="resultType">
     <option value="true">成功</option>
     <option value="">失敗</option>
   </select>
@@ -60,35 +60,97 @@
 
 <script type="text/javascript">
 
-function run() {
-  var deffered = $.Deferred();
+
+// ------------------------------------- Step1 まずはシンプルに理解する Start
+
+function execute1Run(deferred, value1, value2) {
+	var calced = value1 + value2;
+	if(calced % 2 == 0) {
+		deferred.resolve(); // 成功を通知
+	} else {
+		deferred.reject(); // 失敗を通知
+	}
+}
+
+var execute1 = function(){
+	var deferred = $.Deferred();
+	var promise = deferred.promise();
+	
+	// 後続処理の登録
+	promise.done(function() { console.log("step1. even!! success.");} );
+	promise.fail(function() { console.log("step1. fail.");   } );
+	// 実行
+	execute1Run(deferred, 5, 3);
+	
+}
+// -------------------------------------- Step1 まずはシンプルに理解する End
+// -------------------------------------- Step2 元となる処理の中でDeferred、promiseを作成 Start
+
+function execute2Run() {
+  // 処理の中でDeferredを作成してpromiseを返却
+  var deferred = $.Deferred();
   
-  // ここでpromiseの値を確定させてしまってもOK。
+  // ここで実処理を行う。非同期のajaxなどの処理を行う場合、ここで即座に処理結果は確定しない。
   var resultType = Boolean( $('#resultType').val() );
-  console.log("resultType", resultType);
-  resultType ? deffered.resolve("parameter for done!!") : deffered.reject("parameter for fail!!");
+  console.log("Step2 resultType", resultType);
+  resultType ? deferred.resolve("parameter for done!!") : deferred.reject("parameter for fail!!");
   
-  // 返却オブジェクトがPromiseになる。
-  return deffered.promise();
+  // Promiseを返却。
+  return deferred.promise();
 }
 
 function done(data){
-  console.log("done called.", data);
+  console.log("Step2 done called.", data);
 }
 
 function fail(data) {
-  console.log("fail called", data);
+  console.log("Step2 fail called", data);
 }
 
 function always(data) {
-  console.log("always called", data);
+  console.log("Step2 always called", data);
 }
 
+var execute2 = function(){
+	// 処理を呼び出し、結果の値でなくpromiseを受け取る。promiseは処理が終わり次第実行される。
+	var promise = execute2Run();
+	// 処理を登録しておく。
+	promise.done(done);
+	promise.fail(fail);
+	promise.always(always);
+}
+// ------------------------------------- Step2 元となる処理の中でDeferred、promiseを作成 End
+// ------------------------------------- Step3 Promiseが返却されるならそのまま定義しちゃおう Start
+
+function execute3Run(flg) {
+  // 処理の中でDeferredを作成してpromiseを返却
+  var deferred = $.Deferred();
+
+  // ここで実処理して結果を求めるけど
+  flg ? deferred.resolve("parameter for done!!") : deferred.reject("parameter for fail!!");
+  
+  // Promiseを返却。
+  return deferred.promise();
+}
+
+var execute3 = function(){
+	// 結果がpromiseならそのままdone,fail,alwaysがかけたらいいよね。書けます。
+	execute3Run(true).done(function(){
+		console.log("Step3 call done!")
+	}).fail(function(){
+		console.log("Step3 call fail!")
+	}).always(function(){
+		console.log("Step3 call always!!")
+	});
+}
+
+// ------------------------------------- Step3 Promiseが返却されるならそのまま定義しちゃおう End
+
 $('#exec').on('click', function() {
-  var promise = run();
-  promise.done(done);
-  promise.fail(fail);
-  promise.always(always);
+	execute1();
+	execute2();
+	execute3();
+	// メモ。実は$.ajaxもpromiseを返却するからsuccessを使わずにexecute3のようにdoneが使えるよ。
 });
 </script>
 
